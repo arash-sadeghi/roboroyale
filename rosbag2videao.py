@@ -28,33 +28,49 @@ if __name__ == '__main__':
 
     args=Args()
     bridge = CvBridge()
-    video_file_name=args.input_dir+ctime(time()).replace(":","_")+".avi"
-    FPS=48
     TIME_INTERVAL=30
-    size = (1280,720)
-    video = cv2.VideoWriter(video_file_name,cv2.VideoWriter_fourcc(*'XVID'), FPS, size)
     bag_list=os.listdir(args.input_dir)
     bag_list.sort()    
-    for file in bag_list:
-        print("[+] Extract images from {} on topic {} into {}".format(file,args.image_topic, video_file_name))
-        bag = rosbag.Bag(args.input_dir+file, "r")
-        print("[+] bag successfully read")
-        time_tmp=next(bag.read_messages(args.image_topic))[2].to_sec()
-        count = 0
-        
-        for topic, msg, t in bag.read_messages(args.image_topic):
-            if int(t.to_sec()-time_tmp)==TIME_INTERVAL:
-                time_tmp=t.to_sec()
-                cv_img = bridge.compressed_imgmsg_to_cv2(msg)
-                video.write(cv2.cvtColor(cv_img, cv2.COLOR_GRAY2BGR))
-                count += 1
-                percentage=count/(24*3600/30)*100
-                print("[+] progress {:.2f}".format(percentage),end='\r')
+    tmp=bag_list
 
-        print("\n[+] bag {} added".format(file))
-        bag.close()
-    video.release()
-    print("\n[+] DONE!")
+    for i in tmp:
+        if not '.bag' in i:
+            bag_list.remove(i)
+    
+    written_bags=[]
+    video_file_name=args.input_dir+ctime(time()).replace(":","_")+".avi"
+    bag_log=open(video_file_name[0:-4]+'.txt','w') 
+    size = (1280,720)
+    FPS=48
+    video=cv2.VideoWriter(video_file_name,cv2.VideoWriter_fourcc(*'XVID'), FPS, size)
+    try:
+        for file in bag_list:
+            print("[+] Extract images from {} on topic {} into {}".format(file,args.image_topic, video_file_name))
+            bag_log.write(args.input_dir+file+'\n')
+            bag = rosbag.Bag(args.input_dir+file, "r")
+            print("[+] bag successfully read")
+            time_tmp=next(bag.read_messages(args.image_topic))[2].to_sec()
+            count = 0
+            
+            for topic, msg, t in bag.read_messages(args.image_topic):
+                if int(t.to_sec()-time_tmp)==TIME_INTERVAL:
+                    time_tmp=t.to_sec()
+                    cv_img = bridge.compressed_imgmsg_to_cv2(msg)
+                    video.write(cv2.cvtColor(cv_img, cv2.COLOR_GRAY2BGR))
+                    count += 1
+                    percentage=count/(24*3600/30)*100
+                    print("[+] progress {:.2f}".format(percentage),end='\r')
+
+            print("\n[+] bag {} added".format(file))
+            bag.close()
+        bag_log.close()
+        video.release()
+        print("\n[+] DONE!")
+    
+    except Exception as E:
+        print('[-] Error occured: '+E)
+        bag_log.close()
+        video.release()
 ''' ctime(t.to_sec()) '''
 '''
 30 mins one day
