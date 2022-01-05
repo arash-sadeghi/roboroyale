@@ -57,8 +57,6 @@ if __name__ == '__main__':
                     cv_img = bridge.compressed_imgmsg_to_cv2(msg)
                     cv_img=cv2.cvtColor(cv_img, cv2.COLOR_GRAY2BGR)
                     cv2.putText(cv_img,ctime(t.to_sec()) , (0,size[1]-10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
-                    cv2.imwrite(args.input_dir+'im.png',cv_img)
-                    
                     video.write(cv_img)
                     count += 1
                     percentage=count/(24*3600/30)*100
