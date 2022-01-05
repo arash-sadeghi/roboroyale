@@ -31,14 +31,13 @@ if __name__ == '__main__':
     TIME_INTERVAL=30
     bag_list=os.listdir(args.input_dir)
     bag_list.sort()    
-    tmp=bag_list
+    tmp=bag_list.copy()
 
     for i in tmp:
-        if not '.bag' in i:
+        if not ('.bag' in i):
             bag_list.remove(i)
-    
     written_bags=[]
-    video_file_name=args.input_dir+ctime(time()).replace(":","_")+".avi"
+    video_file_name=args.input_dir+ctime(time()).replace(":","_").replace(" ","_")+".avi"
     bag_log=open(video_file_name[0:-4]+'.txt','w') 
     size = (1280,720)
     FPS=48
@@ -56,7 +55,11 @@ if __name__ == '__main__':
                 if int(t.to_sec()-time_tmp)==TIME_INTERVAL:
                     time_tmp=t.to_sec()
                     cv_img = bridge.compressed_imgmsg_to_cv2(msg)
-                    video.write(cv2.cvtColor(cv_img, cv2.COLOR_GRAY2BGR))
+                    cv_img=cv2.cvtColor(cv_img, cv2.COLOR_GRAY2BGR)
+                    cv2.putText(cv_img,ctime(t.to_sec()) , (0,size[1]-10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+                    cv2.imwrite(args.input_dir+'im.png',cv_img)
+                    
+                    video.write(cv_img)
                     count += 1
                     percentage=count/(24*3600/30)*100
                     print("[+] progress {:.2f}".format(percentage),end='\r')
@@ -68,7 +71,7 @@ if __name__ == '__main__':
         print("\n[+] DONE!")
     
     except Exception as E:
-        print('[-] Error occured: '+E)
+        print('[-] Error occured: ',E)
         bag_log.close()
         video.release()
 ''' ctime(t.to_sec()) '''
