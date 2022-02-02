@@ -1,0 +1,2 @@
+scp graz_weather_dec.csv  arash@chrono_server:/home/users/aamjadi/arash_workdir/roboroyale/roboroyale
+

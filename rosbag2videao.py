@@ -26,7 +26,8 @@ class Args:
     def __init__(self):
         self.bag_file=""
         #self.image_topic="/d435/1/infra1/image_rect_raw/compressed"
-        self.image_topic="/cam/infra1/image_rect_raw/compressed_slowed"
+        self.image_topic="/cam/infra1/image_rect_raw/slowed/compressed"
+        #self.image_topic="/cam/infra1/image_rect_raw/compressed_slowed"
         self.input_dir="/home/users/aamjadi/hdd/rosbags/"
         self.output_dir="/home/users/aamjadi/hdd/rosbags/"
 
